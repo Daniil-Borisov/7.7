@@ -1,0 +1,24 @@
+.table{
+    max-width: 976px;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-row{
+    display: flex;
+}
+
+.table-row > div {
+    border: 1px solid black;
+    flex: 1 1 30px;
+    text-align: center;
+}
+
+.fav {
+    margin: 5px 10px;
+}
+
+#degrees {
+    margin-left: 5px;
+}
