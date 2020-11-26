@@ -1,110 +1,94 @@
 import React from "react";
+import { connect } from "react-redux";
+import { weatherFetchData } from "../store/actions/fetch";
 
 class Weather extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            error: null,
-            isLoaded: false,
-            items: []
-        };
-    }
 
     componentDidMount() {
-        const city = this.props.value
-        const url = "https://community-open-weather-map.p.rapidapi.com/forecast/daily?cnt=10&units=metric&q=" + city
-        fetch( url, {
-            "method": "GET",
-            "headers": {
-                "x-rapidapi-key": "8948d5b5d8msh7598122ce0ab0cap172c7cjsnd7fbfc8b69fb",
-                "x-rapidapi-host": "community-open-weather-map.p.rapidapi.com"
-            }
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        isLoaded: true,
-                        items: result.list
-                    });
-                },
-
-                (error) => {
-                    this.setState({
-                        isLoaded: true,
-                        error
-                    });
-                }
-            )
+        this.props.fetchData(this.props.cityName)
     }
 
     render() {
-        const { error, isLoaded, items } = this.state;
-        const tempMin =[],
-            tempMax = [];
+
+        const error = this.props.hasErrored,
+            isLoaded = this.props.isLoading,
+            items = this.props.items,
+            tempMin =[],
+            tempMax = [],
+            imgUrl = [];
         if (this.props.temp && items){
             tempMin.length = 0;
             tempMax.length = 0;
-            items.map(item => {
+            items.forEach(item => {
                 tempMin.push(Math.floor(item.temp.min) + String.fromCharCode(8451))
                 tempMax.push(Math.floor(item.temp.max) + String.fromCharCode(8451))
+
             })
         } else if(!this.props.temp && items) {
             tempMin.length = 0;
             tempMax.length = 0;
-            items.map(item => {
+            items.forEach(item => {
                 tempMin.push((Math.floor(item.temp.min * 1.8 + 32)) + String.fromCharCode(8457))
                 tempMax.push((Math.floor(item.temp.max * 1.8 + 32)) + String.fromCharCode(8457))
             })
         }
         if (error) {
-            return <div>Ошибка: {error.message}</div>;
-        } else if (!isLoaded) {
+            return <div>Error. Enter correct city name</div>;
+        } else if (isLoaded) {
             return <div>Загрузка...</div>;
-        } else if(!items){
-            return <div>Enter correct name</div>
         } else {
-            if(!this.props.fav.includes(this.props.value)) {
-                this.props.fav.push(this.props.value);
-            }
-            return (
-                <div className="table">
-                    <p>Weather in {this.props.value}</p>
-                    <div className="table-row">
-                        <div className="date">Date</div>
-                        <div className="temp">Temp min/max</div>
-                        <div className="description">Description</div>
-                        <div className="wind">Wind</div>
-                        <div className="pressure">Pressure</div>
-                        <div className="humidity">Humidity</div>
-                    </div>
+            items.forEach(item => {
+                imgUrl.push("owf owf-"+ item.weather[0].id +" owf-5x icon-style")
+            })
 
-                    {items.map((item, i) => (
-                        <div key={item.dt} className={'table-row'}>
-                            <div className="date">
-                                {new Date(item.dt*1000).toLocaleDateString()}
+            return (
+                <div className="wrapper">
+                    <div className="title">Weather in {this.props.cityName} on 7 days</div>
+                    <div className="cardWrapper">
+                        {this.props.items.map((item, i) => (
+                            <div key={item.dt} className={'weatherCard'}>
+                                <div className="date">
+                                    <div>
+                                        {new Date(item.dt*1000).toLocaleDateString('eng', {weekday: 'long'})}
+                                    </div>
+                                    <div>
+                                        {new Date(item.dt*1000).toLocaleDateString()}
+                                    </div>
+                                </div>
+                                <div className="descriptionImg">
+                                    <i className={imgUrl[i]}></i>
+                                </div>
+                                <div className="temp">
+                                    {tempMin[i]} / {tempMax[i]}
+                                </div>
+                                <div className="description">
+                                    {item.weather[0].description}
+                                </div>
                             </div>
-                            <div className="temp">
-                                {tempMin[i]} / {tempMax[i]}
-                            </div>
-                            <div className="description">
-                                {item.weather[0].description}
-                            </div>
-                            <div className="wind">
-                                {Math.floor(item.speed)+' m/s'}
-                            </div>
-                            <div className="pressure">
-                                {item.pressure}
-                            </div>
-                            <div className="humidity">
-                                {item.humidity}
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             );
         }
     }
 }
 
-export default Weather
+const mapStateToProps = (state) => {
+    return {
+        cityName: state.city.cityName,
+        temp: state.city.temp,
+        favCity: state.city.favCity,
+        items: state.items,
+        hasErrored: state.itemsHasErrored,
+        isLoading: state.itemsIsLoading
+
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        fetchData: (url) => dispatch(weatherFetchData(url)),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Weather)

@@ -1,22 +1,61 @@
-.table{
+*{
+    box-sizing: border-box;
+}
+
+.mainWrapper{
+    margin-left: auto;
+}
+
+.wrapper{
+    margin-top: 10px;
+    padding-bottom: 10px;
     max-width: 976px;
-    margin: 10px;
+    width: 100%;
     display: flex;
     flex-direction: column;
+    border: 1px solid grey;
 }
 
-.table-row{
+.cardWrapper{
     display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
 }
 
-.table-row > div {
-    border: 1px solid black;
-    flex: 1 1 30px;
+.weatherCard{
+    border: 1px solid #e5e5e5;
+    padding: 5px 2px;
+    border-radius: 3px;
+    margin-left: 10px;
+    text-align: center;
+    width: 14%;
+    background-color: #eee;
+}
+
+.cardWrapper:last-child{
+    margin-right: 10px;
+}
+
+.title{
+    font-size: 28px;
+    padding: 15px;
+    background-color: #dae3ff;
     text-align: center;
 }
 
-.fav {
-    margin: 5px 10px;
+.description{
+    background-color: #00aeef;
+    margin: 5px;
+    color: #fff;
+}
+
+i{
+    color: #00aeef;
+}
+
+.fav{
+    margin: 10px;
+
 }
 
 #degrees {
